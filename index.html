@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="midnight">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="VoxScribe — A modern, browser-based Automatic Speech Recognition (ASR) tool powered by the Web Speech API. Real-time transcription with a premium UI.">
-    <title>VoxScribe — ASR Speech Recognition Tool</title>
+    <meta name="description" content="VoxScribe Pro — Advanced Browser-based ASR (Automatic Speech Recognition) Tool with live audio visualization, WPM analytics, WER benchmark, TTS, audio recording, and multi-format export.">
+    <title>VoxScribe Pro — Advanced ASR Speech Recognition & Evaluation Tool</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -30,29 +30,58 @@
                         <line x1="8" y1="23" x2="16" y2="23"/>
                     </svg>
                 </div>
-                <h1 class="logo-text">VoxScribe</h1>
-                <span class="logo-badge">ASR</span>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <h1 class="logo-text">VoxScribe</h1>
+                        <span class="logo-badge">ASR PRO</span>
+                    </div>
+                    <p class="logo-subtext">Automatic Speech Recognition & Benchmark Suite</p>
+                </div>
             </div>
+            
             <div class="header-controls">
                 <div class="language-selector" id="language-selector">
                     <label for="language-select">Language</label>
                     <select id="language-select">
                         <option value="en-US">English (US)</option>
                         <option value="en-GB">English (UK)</option>
-                        <option value="en-IN">English (India)</option>
-                        <option value="hi-IN">Hindi</option>
-                        <option value="es-ES">Spanish</option>
-                        <option value="fr-FR">French</option>
-                        <option value="de-DE">German</option>
-                        <option value="ja-JP">Japanese</option>
-                        <option value="ko-KR">Korean</option>
-                        <option value="zh-CN">Chinese (Simplified)</option>
-                        <option value="pt-BR">Portuguese (Brazil)</option>
-                        <option value="ar-SA">Arabic</option>
-                        <option value="ru-RU">Russian</option>
-                        <option value="it-IT">Italian</option>
+                        <option value="en-IN" selected>English (India)</option>
+                        <option value="hi-IN">Hindi (हिंदी)</option>
+                        <option value="es-ES">Spanish (Español)</option>
+                        <option value="fr-FR">French (Français)</option>
+                        <option value="de-DE">German (Deutsch)</option>
+                        <option value="ja-JP">Japanese (日本語)</option>
+                        <option value="ko-KR">Korean (한국어)</option>
+                        <option value="zh-CN">Chinese (中文)</option>
+                        <option value="pt-BR">Portuguese (Brasil)</option>
+                        <option value="ar-SA">Arabic (العربية)</option>
+                        <option value="ru-RU">Russian (Русский)</option>
+                        <option value="it-IT">Italian (Italiano)</option>
                     </select>
                 </div>
+
+                <div class="theme-selector">
+                    <select id="theme-select" title="Change Theme">
+                        <option value="midnight">🌙 Midnight</option>
+                        <option value="cyber">⚡ Cyber Neon</option>
+                        <option value="emerald">🌲 Emerald Matrix</option>
+                        <option value="sunset">🌅 Sunset Gold</option>
+                    </select>
+                </div>
+
+                <button class="btn-tool" id="btn-wer-benchmark" title="ASR WER / Accuracy Benchmark">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 20V10M12 20V4M6 20v-6"/>
+                    </svg>
+                    <span>WER Test</span>
+                </button>
+
+                <button class="btn-icon" id="btn-help-commands" title="Voice Commands Reference" aria-label="Voice commands reference">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                </button>
+
                 <button class="btn-icon" id="btn-settings" title="Settings" aria-label="Toggle settings panel">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="3"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.73 12.73 1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
@@ -61,11 +90,12 @@
             </div>
         </header>
 
-        <!-- Status Bar -->
+        <!-- Status & Live Metrics Bar -->
         <div class="status-bar" id="status-bar">
             <div class="status-indicator" id="status-indicator">
                 <span class="status-dot"></span>
                 <span class="status-text" id="status-text">Ready to listen</span>
+                <span class="badge-rec" id="badge-rec" style="display: none;">AUDIO REC ON</span>
             </div>
             <div class="stats-group">
                 <div class="stat-item" id="stat-words">
@@ -76,10 +106,38 @@
                     <span class="stat-value" id="char-count">0</span>
                     <span class="stat-label">Chars</span>
                 </div>
+                <div class="stat-item" id="stat-wpm">
+                    <span class="stat-value" id="wpm-display">0</span>
+                    <span class="stat-label">WPM (Speed)</span>
+                </div>
+                <div class="stat-item" id="stat-confidence">
+                    <span class="stat-value text-accent" id="confidence-display">--</span>
+                    <span class="stat-label">Confidence</span>
+                </div>
                 <div class="stat-item" id="stat-duration">
                     <span class="stat-value" id="duration-display">0:00</span>
                     <span class="stat-label">Duration</span>
                 </div>
+            </div>
+        </div>
+
+        <!-- Recorded Audio Player Banner (Hidden until audio is recorded) -->
+        <div class="audio-playback-banner" id="audio-playback-banner" style="display: none;">
+            <div class="audio-banner-left">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                </svg>
+                <span>Captured Audio:</span>
+                <audio id="recorded-audio-player" controls preload="metadata"></audio>
+            </div>
+            <div class="audio-banner-right">
+                <button class="btn-ghost" id="btn-download-audio" title="Download Recorded Audio (.webm)">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    <span>Download Audio</span>
+                </button>
+                <button class="btn-icon-xs" id="btn-dismiss-audio" title="Dismiss">✕</button>
             </div>
         </div>
 
@@ -88,20 +146,52 @@
             <!-- Transcription Panel -->
             <section class="transcript-panel" id="transcript-panel">
                 <div class="panel-header">
-                    <h2>Transcription</h2>
+                    <div class="panel-header-title">
+                        <h2>Live Transcription</h2>
+                        <span class="transcript-mode-pill" id="mode-pill">Real-time Stream</span>
+                    </div>
+
+                    <!-- Search Bar in Header -->
+                    <div class="transcript-search-box">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                        <input type="text" id="search-input" placeholder="Search in text...">
+                        <span class="search-count" id="search-count"></span>
+                    </div>
+
                     <div class="panel-actions">
+                        <!-- Text-to-Speech Playback Button -->
+                        <button class="btn-ghost" id="btn-tts-speak" title="Read Transcript Aloud (Text-to-Speech)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3"/>
+                            </svg>
+                            <span id="tts-btn-text">Read Aloud</span>
+                        </button>
+
                         <button class="btn-ghost" id="btn-copy" title="Copy to clipboard" aria-label="Copy transcript to clipboard">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                             </svg>
                             <span>Copy</span>
                         </button>
-                        <button class="btn-ghost" id="btn-download" title="Download transcript" aria-label="Download transcript as text file">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-                            </svg>
-                            <span>Download</span>
-                        </button>
+
+                        <!-- Multi-format Export Dropdown -->
+                        <div class="dropdown-wrapper">
+                            <button class="btn-ghost" id="btn-export-menu" title="Export transcript in various formats">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                <span>Export ▼</span>
+                            </button>
+                            <div class="dropdown-content" id="export-dropdown" style="display: none;">
+                                <button class="dropdown-item" id="export-txt">📄 Plain Text (.txt)</button>
+                                <button class="dropdown-item" id="export-srt">⏱️ Subtitles with Timestamps (.srt)</button>
+                                <button class="dropdown-item" id="export-json">📊 Structured JSON (.json)</button>
+                                <button class="dropdown-item" id="export-md">📝 Markdown Report (.md)</button>
+                            </div>
+                        </div>
+
                         <button class="btn-ghost btn-danger" id="btn-clear" title="Clear transcript" aria-label="Clear all transcript text">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -110,6 +200,27 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- AI Formatting & Editing Toolbar -->
+                <div class="nlp-toolbar" id="nlp-toolbar">
+                    <span class="nlp-toolbar-label">⚡ Smart Actions:</span>
+                    <button class="nlp-btn" id="btn-remove-fillers" title="Remove hesitation sounds like 'um', 'uh', 'like'">
+                        🧹 Clean Fillers (um/uh)
+                    </button>
+                    <button class="nlp-btn" id="btn-auto-punctuate" title="Auto Capitalize and Punctuate sentences">
+                        ✨ Auto-Capitalize
+                    </button>
+                    <button class="nlp-btn" id="btn-uppercase" title="Convert to UPPERCASE">
+                        AA Uppercase
+                    </button>
+                    <button class="nlp-btn" id="btn-lowercase" title="Convert to lowercase">
+                        aa Lowercase
+                    </button>
+                    <button class="nlp-btn" id="btn-titlecase" title="Convert to Title Case">
+                        Aa Title Case
+                    </button>
+                </div>
+
                 <div class="transcript-area" id="transcript-area">
                     <div class="transcript-placeholder" id="transcript-placeholder">
                         <div class="placeholder-icon">
@@ -120,18 +231,21 @@
                                 <line x1="8" y1="23" x2="16" y2="23"/>
                             </svg>
                         </div>
-                        <p class="placeholder-title">Start speaking to transcribe</p>
-                        <p class="placeholder-subtitle">Click the microphone button below to begin real-time speech recognition</p>
+                        <p class="placeholder-title">Start speaking to transcribe in real-time</p>
+                        <p class="placeholder-subtitle">Click the microphone button below or press <code>Space</code> to begin speech recognition</p>
+                        <div class="tips-tag">
+                            <span>💡 Tip: Try saying <em>"comma"</em>, <em>"period"</em>, or <em>"new line"</em> for voice punctuation!</span>
+                        </div>
                     </div>
                     <div class="transcript-content" id="transcript-content"></div>
                     <span class="interim-text" id="interim-text"></span>
                 </div>
             </section>
 
-            <!-- History Panel (collapsible) -->
+            <!-- History Panel -->
             <section class="history-panel" id="history-panel">
                 <div class="panel-header">
-                    <h2>Session History</h2>
+                    <h2>Session History & Analytics</h2>
                     <button class="btn-ghost" id="btn-clear-history" title="Clear history" aria-label="Clear all session history">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -147,9 +261,9 @@
             </section>
         </main>
 
-        <!-- Microphone Control -->
+        <!-- Microphone Control & Visualizer -->
         <div class="mic-control-wrapper" id="mic-control-wrapper">
-            <!-- Audio Visualizer -->
+            <!-- Audio Visualizer Canvas -->
             <canvas id="audio-visualizer" class="audio-visualizer"></canvas>
 
             <div class="mic-control-group">
@@ -169,7 +283,106 @@
                         </svg>
                     </div>
                 </button>
-                <p class="mic-label" id="mic-label">Click to start</p>
+                <p class="mic-label" id="mic-label">Click or press Space to start</p>
+            </div>
+        </div>
+
+        <!-- WER Benchmark Modal -->
+        <div class="modal-overlay" id="wer-modal" style="display:none;">
+            <div class="modal-content modal-lg" id="wer-modal-content">
+                <div class="modal-header">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2">
+                            <path d="M18 20V10M12 20V4M6 20v-6"/>
+                        </svg>
+                        <h2>ASR Evaluation & Word Error Rate (WER) Benchmark</h2>
+                    </div>
+                    <button class="btn-icon" id="btn-close-wer" aria-label="Close WER Benchmark">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="benchmark-intro">
+                        Calculate the scientific accuracy of your ASR model using <strong>Levenshtein Alignment</strong>. Compares Reference (Ground Truth) vs Hypothesis (ASR Transcript).
+                    </p>
+
+                    <div class="wer-inputs-grid">
+                        <div class="wer-input-block">
+                            <label for="wer-ref-text">Reference Ground Truth (What was actually spoken):</label>
+                            <textarea id="wer-ref-text" placeholder="Enter or paste the exact spoken sentence here..."></textarea>
+                        </div>
+                        <div class="wer-input-block">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                                <label for="wer-hyp-text">Hypothesis (ASR Recognition Output):</label>
+                                <button class="btn-ghost-sm" id="btn-copy-current-to-hyp">📋 Use Current Transcript</button>
+                            </div>
+                            <textarea id="wer-hyp-text" placeholder="ASR output text to evaluate..."></textarea>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:12px;">
+                        <button class="btn-primary" id="btn-calculate-wer">🚀 Calculate Accuracy Metrics</button>
+                    </div>
+
+                    <!-- Benchmark Results Block -->
+                    <div class="wer-results-card" id="wer-results-card" style="display: none;">
+                        <div class="wer-metrics-grid">
+                            <div class="wer-metric-box">
+                                <span class="wer-metric-val text-accent" id="res-wer">0.0%</span>
+                                <span class="wer-metric-lbl">Word Error Rate (WER)</span>
+                            </div>
+                            <div class="wer-metric-box">
+                                <span class="wer-metric-val" id="res-accuracy">100%</span>
+                                <span class="wer-metric-lbl">Word Accuracy</span>
+                            </div>
+                            <div class="wer-metric-box">
+                                <span class="wer-metric-val" id="res-cer">0.0%</span>
+                                <span class="wer-metric-lbl">Char Error Rate (CER)</span>
+                            </div>
+                            <div class="wer-metric-box">
+                                <span class="wer-metric-val" id="res-details">S:0 | D:0 | I:0</span>
+                                <span class="wer-metric-lbl">Sub | Del | Ins</span>
+                            </div>
+                        </div>
+
+                        <!-- Alignment Diff -->
+                        <div class="alignment-box">
+                            <h4>Word Alignment Analysis:</h4>
+                            <div class="alignment-diff" id="alignment-diff"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Voice Commands Guide Modal -->
+        <div class="modal-overlay" id="commands-modal" style="display:none;">
+            <div class="modal-content" id="commands-modal-content">
+                <div class="modal-header">
+                    <h2>🎙️ Supported Voice Commands</h2>
+                    <button class="btn-icon" id="btn-close-commands" aria-label="Close Voice Commands">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:12px;">
+                        Say any of these phrases while dictating to automatically execute punctuation and actions:
+                    </p>
+                    <div class="commands-table">
+                        <div class="cmd-row"><strong>"period" / "full stop"</strong> <span>Inserts <code>.</code></span></div>
+                        <div class="cmd-row"><strong>"comma"</strong> <span>Inserts <code>,</code></span></div>
+                        <div class="cmd-row"><strong>"question mark"</strong> <span>Inserts <code>?</code></span></div>
+                        <div class="cmd-row"><strong>"exclamation mark"</strong> <span>Inserts <code>!</code></span></div>
+                        <div class="cmd-row"><strong>"new line" / "enter"</strong> <span>Inserts line break</span></div>
+                        <div class="cmd-row"><strong>"colon"</strong> <span>Inserts <code>:</code></span></div>
+                        <div class="cmd-row"><strong>"clear transcript"</strong> <span>Clears all text</span></div>
+                        <div class="cmd-row"><strong>"stop listening"</strong> <span>Halts recognition</span></div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -177,7 +390,7 @@
         <div class="modal-overlay" id="settings-modal" style="display:none;">
             <div class="modal-content" id="settings-modal-content">
                 <div class="modal-header">
-                    <h2>Settings</h2>
+                    <h2>Settings & Engine Parameters</h2>
                     <button class="btn-icon" id="btn-close-settings" aria-label="Close settings">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -187,7 +400,7 @@
                 <div class="modal-body">
                     <div class="setting-group">
                         <label class="setting-label" for="setting-continuous">Continuous Listening</label>
-                        <p class="setting-desc">Keep listening after pauses in speech</p>
+                        <p class="setting-desc">Keep listening continuously across pauses in speech</p>
                         <label class="toggle">
                             <input type="checkbox" id="setting-continuous" checked>
                             <span class="toggle-slider"></span>
@@ -195,23 +408,39 @@
                     </div>
                     <div class="setting-group">
                         <label class="setting-label" for="setting-interim">Show Interim Results</label>
-                        <p class="setting-desc">Display partial results as you speak</p>
+                        <p class="setting-desc">Display low-latency partial word hypotheses as you speak</p>
                         <label class="toggle">
                             <input type="checkbox" id="setting-interim" checked>
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
                     <div class="setting-group">
+                        <label class="setting-label" for="setting-commands">Voice Commands Engine</label>
+                        <p class="setting-desc">Parse spoken punctuation like "comma", "period", "new line"</p>
+                        <label class="toggle">
+                            <input type="checkbox" id="setting-commands" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-group">
+                        <label class="setting-label" for="setting-record-audio">Capture Raw Microphone Audio</label>
+                        <p class="setting-desc">Record audio alongside transcription for playback and export</p>
+                        <label class="toggle">
+                            <input type="checkbox" id="setting-record-audio" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-group">
                         <label class="setting-label" for="setting-autosave">Auto-save Sessions</label>
-                        <p class="setting-desc">Automatically save transcripts to history</p>
+                        <p class="setting-desc">Automatically archive transcripts into LocalStorage history</p>
                         <label class="toggle">
                             <input type="checkbox" id="setting-autosave" checked>
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
                     <div class="setting-group">
-                        <label class="setting-label" for="setting-timestamps">Show Timestamps</label>
-                        <p class="setting-desc">Add timestamps to each recognized segment</p>
+                        <label class="setting-label" for="setting-timestamps">Show Segment Timestamps</label>
+                        <p class="setting-desc">Prefix each recognized speech segment with [mm:ss]</p>
                         <label class="toggle">
                             <input type="checkbox" id="setting-timestamps">
                             <span class="toggle-slider"></span>
@@ -219,7 +448,7 @@
                     </div>
                     <div class="setting-group">
                         <label class="setting-label" for="setting-font-size">Font Size</label>
-                        <p class="setting-desc">Adjust transcript text size</p>
+                        <p class="setting-desc">Adjust transcript display font size</p>
                         <input type="range" id="setting-font-size" min="14" max="28" value="17" class="range-slider">
                         <span class="range-value" id="font-size-value">17px</span>
                     </div>
